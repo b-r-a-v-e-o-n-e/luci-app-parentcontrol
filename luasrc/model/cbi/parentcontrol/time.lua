@@ -1,11 +1,13 @@
-local o = require "luci.sys"
+ local o = require "luci.sys"
 local fs = require "nixio.fs"
 local ipc = require "luci.ip"
 local net = require "luci.model.network".init()
 local sys = require "luci.sys"
+
 local a, t, e
-a = Map("parentcontrol", translate("Parent Control"), translate("<b><font color=\"green\">Use iptables Tool software to control packet filtering and prohibit users who meet set conditions from connecting to the Internet.</font> </b></br>\
-Time limit: Restrictions specified MAC Whether the address machine is connected to the Internet. Includes IPV4 and IPV6</br>Not specifying MAC means restricting all machines. The start control time should be less than the stop control time. Not specifying time means all time periods." ))
+a = Map("parentcontrol", translate("Parent Control"), translate("<b><font color=\"green\">A tool software that uses iptables to control packet filtering and prohibit users who meet set conditions from connecting to the Internet.</font> </b></br>\
+URL filtering: Specify “Keyword/URL” filtering, which can be a string or URL. Including IPV4 and IPV6</br>Not specifying MAC means controlling all machines. The start control time should be less than the stop control time. Not specifying time means all time periods." ))
+
 
 a.template = "parentcontrol/index"
 t = a:section(TypedSection, "basic", translate(""))
@@ -24,19 +26,20 @@ e.default = "kmp"
 
 e = t:option(ListValue, "control_mode",translate("Restricted mode"), translate("In blacklist mode, client settings in the list will be prohibited; In whitelist mode: Only client settings in the list are allowed."))
 e.rmempty = false
-e:value("white_mode", "Whitelist")
-e:value("black_mode", "Blacklist")
+e:value("white_mode", "whitelists")
+e:value("black_mode", "blacklists")
 e.default = "black_mode"
 
-t = a:section(TypedSection, "time", translate("Time limit"))
+t = a:section(TypedSection, "weburl", translate("URL filtering"))
 t.template = "cbi/tblsection"
 t.anonymous = true
 t.addremove = true
 
-e = t:option(Value, "mac", translate("<font color=\"green\">MAC address*</font>"))
+e = t:option(Value, "mac", translate("MAC address<font color=\"green\">(Leave blank to filter all clients)</font>"))
 e.rmempty = true
 o.net.mac_hints(function(t, a) e:value(t, "%s (%s)" % {t, a}) end)
-
+e = t:option( Value, "word", translate("Keywords/URL<font color=\"green\">(Can be left blank)</font>"))
+e.rmempty = true
     function validate_time(self, value, section)
         local hh, mm, ss
         hh, mm, ss = string.match (value, "^(%d?%d):(%d%d)$")
@@ -70,7 +73,6 @@ week:value(4,translate("Thursday"))
 week:value(5,translate("Friday"))
 week:value(6,translate("Saturday"))
 week.default='*'
-
 
 e = t:option(Flag, "enable", translate("Turn on"))
 e.rmempty = false
