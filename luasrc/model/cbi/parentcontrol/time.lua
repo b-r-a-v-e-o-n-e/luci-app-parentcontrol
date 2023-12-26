@@ -4,36 +4,36 @@ local ipc = require "luci.ip"
 local net = require "luci.model.network".init()
 local sys = require "luci.sys"
 local a, t, e
-a = Map("parentcontrol", translate("Parent Control"), translate("<b><font color=\"green\">利用iptables来管控数据包过滤以禁止符合设定条件的用户连接互联网的工具软件。</font> </b></br>\
-时间限制:限制指定MAC地址机器是否联网.包括IPV4和IPV6</br>不指定MAC就是代表限制所有机器,起控时间要小于停控时间，不指定时间表示所有时段" ))
+a = Map("parentcontrol", translate("Parent Control"), translate("<b><font color=\"green\">Use iptables Tool software to control packet filtering and prohibit users who meet set conditions from connecting to the Internet.</font> </b></br>\
+Time limit: Restrictions specified MAC Whether the address machine is connected to the Internet. Includes IPV4 and IPV6</br>Not specifying MAC means restricting all machines. The start control time should be less than the stop control time. Not specifying time means all time periods." ))
 
 a.template = "parentcontrol/index"
 t = a:section(TypedSection, "basic", translate(""))
 t.anonymous = true
-e = t:option(DummyValue, "parentcontrol_status", translate("当前状态"))
+e = t:option(DummyValue, "parentcontrol_status", translate("Current status"))
 e.template = "parentcontrol/parentcontrol"
 e.value = translate("Collecting data...")
 
-e = t:option(Flag, "enabled", translate("开启"))
+e = t:option(Flag, "enabled", translate("Turn on"))
 e.rmempty = false
 
-e = t:option(ListValue, "algos", translate("过滤力度"))
-e:value("bm", "一般过滤")
-e:value("kmp", "强效过滤")
+e = t:option(ListValue, "algos", translate("Filtration strength"))
+e:value("bm", "General filtering")
+e:value("kmp", "Powerful filtering")
 e.default = "kmp"
 
-e = t:option(ListValue, "control_mode",translate("限制模式"), translate("黑名单模式，列表中的客户端设置将被禁止；白名单模式：仅有列表中的客户端设置允许。"))
+e = t:option(ListValue, "control_mode",translate("Restricted mode"), translate("In blacklist mode, client settings in the list will be prohibited; In whitelist mode: Only client settings in the list are allowed."))
 e.rmempty = false
-e:value("white_mode", "白名单")
-e:value("black_mode", "黑名单")
+e:value("white_mode", "Whitelist")
+e:value("black_mode", "Blacklist")
 e.default = "black_mode"
 
-t = a:section(TypedSection, "time", translate("时间限制"))
+t = a:section(TypedSection, "time", translate("Time limit"))
 t.template = "cbi/tblsection"
 t.anonymous = true
 t.addremove = true
 
-e = t:option(Value, "mac", translate("<font color=\"green\">MAC地址*</font>"))
+e = t:option(Value, "mac", translate("<font color=\"green\">MAC address*</font>"))
 e.rmempty = true
 o.net.mac_hints(function(t, a) e:value(t, "%s (%s)" % {t, a}) end)
 
@@ -45,15 +45,15 @@ o.net.mac_hints(function(t, a) e:value(t, "%s (%s)" % {t, a}) end)
         if hh and mm and hh <= 23 and mm <= 59 then
             return value
         else
-            return nil, "时间格式必须为 HH:MM 或者留空"
+            return nil, "The time format must be HH:MM Or leave it blank"
         end
     end
-e = t:option(Value, "timestart", translate("起控时间"))
+e = t:option(Value, "timestart", translate("Start time"))
 e.placeholder = '00:00'
 e.default = '00:00'
 e.validate = validate_time
 e.rmempty = true
-e = t:option(Value, "timeend", translate("停控时间"))
+e = t:option(Value, "timeend", translate("Stop time"))
 e.placeholder = '00:00'
 e.default = '00:00'
 e.validate = validate_time
@@ -72,7 +72,7 @@ week:value(6,translate("Saturday"))
 week.default='*'
 
 
-e = t:option(Flag, "enable", translate("开启"))
+e = t:option(Flag, "enable", translate("Turn on"))
 e.rmempty = false
 e.default = '1'
 
@@ -82,6 +82,5 @@ a.on_after_apply = function(self,map)
 end
 
 return a
-
 
 
